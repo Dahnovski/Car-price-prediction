@@ -6,11 +6,18 @@ car$name <- word(car$name,1)
 head(car)
 
 # строим гистограмму для брендов машин
-ggplot(data = car, aes(x=name, fill = name)) +
+ggplot(data = car, aes(x = name)) +  # Убираем fill для цвета
   geom_bar() +
-  labs(x='Car Brand') +
-  labs(title = "Bar Graph of Car Brand") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  labs(x = "Car Brand", title = "Bar Graph of Car Brand") +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 19),  # Увеличиваем размер шрифта оси X на 5 пунктов
+    axis.text.y = element_text(size = 12),  # Увеличенный размер подписей оси Y
+    axis.title.x = element_text(size = 16, face = "bold"),  # Увеличенный размер заголовка оси X
+    axis.title.y = element_text(size = 16, face = "bold"),  # Увеличенный размер заголовка оси Y
+    plot.title = element_text(size = 18, face = "bold")  # Увеличенный размер заголовка графика
+  )
+
+
 
 # заменяем названия с имен на числовые значения
 car$name <- str_replace(car$name, 'Maruti', '0')
@@ -92,11 +99,35 @@ head(car)
 # проверим пропуски
 sapply(car, function(x) sum(is.na(x)))
 
-# построим столбчатую диаграмму (bar chart), показывающую распределение автомобилей по типу топлива (fuel).
-ggplot(data = car, aes(x=reorder(fuel, fuel, function(x)-length(x)), fill = fuel)) +
-  geom_bar() + labs(x='Fuel') + labs(title = "Bar Graph of Fuel")
+# построим Missingness Map
+library(visdat)
 
-# график распределения по брэндов
+vis_miss(car) +
+  ggtitle("Missingness Map (100% Observed Data)") +
+  theme(
+    plot.title = element_text(size = 20, face = "bold"),  # Увеличенный заголовок
+    axis.title = element_text(size = 18, face = "bold"),  # Увеличенные подписи осей
+    axis.text = element_text(size = 18),                  # Увеличенные значения на осях
+    axis.title.x = element_text(size = 20, face = "bold"), # Увеличенный размер подписи оси X
+    axis.title.y = element_text(size = 20, face = "bold"), # Увеличенный размер подписи оси Y
+    legend.text = element_text(size = 18),                 # Увеличенный размер текста легенды
+    legend.title = element_text(size = 18, face = "bold")  # Увеличенный размер заголовка легенды
+  )
+
+
+# построим столбчатую диаграмму (bar chart), показывающую распределение автомобилей по типу топлива (fuel).
+ggplot(data = car, aes(x = reorder(fuel, fuel, function(x) -length(x)))) +
+  geom_bar() +
+  labs(x = 'Fuel', title = "Bar Graph of Fuel") +
+  theme(
+    axis.title = element_text(size = 20),  # Размер шрифта для подписей осей
+    axis.text = element_text(size = 25),   # Размер шрифта для текста на осях
+    plot.title = element_text(size = 30),  # Размер шрифта для заголовка
+    legend.position = "none"               # Убираем легенду, так как она не нужна
+  )
+
+
+# график распределения по брэндам
 # ggplot(data = car, aes(x = factor(name), fill = factor(name))) +
 #   geom_bar() +
 #   labs(x = 'Car Brand') +
@@ -104,15 +135,75 @@ ggplot(data = car, aes(x=reorder(fuel, fuel, function(x)-length(x)), fill = fuel
 #   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 # создадим столбчатую диаграмму, которая отображает распределение по количеству владельцев автомобилей.
-ggplot(data = car, aes(x=reorder(owner, owner, function(x)-length(x)), fill = owner)) +
+ggplot(data = car, aes(x = reorder(owner, owner, function(x) -length(x)))) +
   geom_bar() +
-  labs(x='Owner') +
-  labs(title = "Bar Graph of Owner") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  labs(x = 'Owner', title = "Bar Graph of Owner") +
+  theme(
+    axis.title = element_text(size = 20),      # Размер шрифта для подписей осей
+    axis.text = element_text(size = 25),       # Размер шрифта для текста на осях
+    plot.title = element_text(size = 25),      # Размер шрифта для заголовка
+    axis.text.x = element_text(angle = 45, hjust = 1), # Наклон подписей на оси X
+    legend.position = "none"                   # Убираем легенду
+  )
+
+# а теперь создадим box plot
+# Пример с использованием числовых данных
+ggplot(data = car, aes(x = reorder(owner, owner, function(x) -length(x)), y = mileage)) +
+  geom_boxplot(outlier.colour = "red", outlier.size = 2) +  # Ящик с выбросами
+  labs(x = 'Owner', y = 'Mileage', title = "Box Plot of Owner") +
+  theme(
+    axis.title = element_text(size = 20),      # Размер шрифта для подписей осей
+    axis.text = element_text(size = 25),       # Размер шрифта для текста на осях
+    plot.title = element_text(size = 25),      # Размер шрифта для заголовка
+    axis.text.x = element_text(angle = 45, hjust = 1), # Наклон подписей на оси X
+    legend.position = "none"                   # Убираем легенду
+  )
+
+
 
 # распределение по количеству мест
-ggplot(data = car, aes(x=reorder(seats, seats, function(x)-length(x)), fill = seats)) +
-  geom_bar() + labs(x='Seats') + labs(title = "Bar Graph of Seats") +theme(axis.text.x = element_text(angle = 90, hjust = 1))
+ggplot(data = car, aes(x = reorder(seats, seats, function(x) -length(x)))) +
+  geom_bar() +
+  labs(x = 'Seats', title = "Bar Graph of Seats") +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 19),  # Увеличиваем шрифт оси X на 5 пунктов
+    axis.text.y = element_text(size = 12),  # Увеличенный размер подписей оси Y
+    axis.title.x = element_text(size = 20, face = "bold"),  # Увеличенный размер заголовка оси X
+    axis.title.y = element_text(size = 20, face = "bold"),  # Увеличенный размер заголовка оси Y
+    plot.title = element_text(size = 18, face = "bold")  # Увеличенный размер заголовка графика
+  )
+
+# График с увеличением размера точек для более популярных типов топлива
+# Подсчет частоты для каждого сочетания года и типа топлива
+car_summary <- car %>%
+  group_by(year, fuel) %>%
+  summarise(count = n())
+
+# Построение графика
+# Подсчет частоты и среднее значение пробега для каждого сочетания года и типа топлива
+car_summary <- car %>%
+  group_by(year, fuel) %>%
+  summarise(
+    km_driven_avg = mean(km_driven, na.rm = TRUE),  # Среднее значение пробега
+    count = n()  # Подсчет количества
+  )
+
+# Построение графика
+ggplot(car_summary, aes(x = year, y = km_driven_avg, color = fuel, size = count)) +
+  geom_point(alpha = 0.6) +  # Точки с размером, основанным на подсчитанных частотах
+  labs(x = "Year of Manufacture", y = "Average Kilometers Driven", title = "Car Mileage vs Year of Manufacture") +
+  theme(
+    plot.title = element_text(size = 20, face = "bold"),  # Увеличенный заголовок
+    axis.title = element_text(size = 18, face = "bold"),  # Увеличенные подписи осей
+    axis.text = element_text(size = 18),                  # Увеличенные значения на осях
+    axis.title.x = element_text(size = 25, face = "bold"), # Увеличенный размер подписи оси X
+    axis.title.y = element_text(size = 25, face = "bold"), # Увеличенный размер подписи оси Y
+    legend.text = element_text(size = 16),                 # Увеличенный размер текста легенды
+    legend.title = element_text(size = 18, face = "bold")  # Увеличенный размер заголовка легенды
+  ) +
+  scale_color_manual(values = c("petrol" = "blue", "diesel" = "green", "CNG" = "orange", "LPG" = "red", "electric" = "purple")) +  # Цвета для топлива
+  theme(legend.position = "bottom")  # Размещение легенды внизу
+
 
 
 # преобразуем категориальные значения "Manual" и "Automatic" в бинарные значения (0 и 1)
@@ -145,25 +236,58 @@ car$fuel <- str_replace(car$fuel, 'LPG', "3")
 car$fuel <- as.numeric(car$fuel)
 table(car$fuel) # посмотрим на то, что у нас вышло
 
-# построим гистограмму для визуализации распределения цен продажи автомобилей + добавим плотность
-ggplot(car, aes(x=selling_price)) +
-  geom_histogram(aes(y=..density..), colour="black", fill="white")+
-  geom_density(alpha=.2, fill="blue")+
-  labs(x='Selling Price ') + labs(title = "Histogram Graph of Selling Price") +
-  scale_x_continuous(trans='log10') # логарифмическая шкала помогает смягчить влияние экстремальной цены (график более понятный и сбалансированный)
+# Построим гистограмму для визуализации распределения цен продажи автомобилей + добавим плотность
+# Построим гистограмму для визуализации распределения цен продажи автомобилей + добавим плотность
+# Подключим библиотеку для работы с форматами
+library(scales)
+
+# Построим гистограмму для визуализации распределения цен продажи автомобилей
+ggplot(car, aes(x = selling_price)) +
+  geom_histogram(aes(y = ..density..), colour = "black", fill = "gray", bins = 30) +  # Гистограмма с цветом в один тон (серый)
+  labs(x = 'Selling Price', title = "Histogram Graph of Selling Price") +  # Названия осей и заголовок
+  scale_x_continuous(trans = 'log10', labels = scales::label_comma(big.mark = ",")) +  # Логарифмическая шкала для оси X и форматирование с запятыми
+  theme(
+    plot.title = element_text(size = 20, face = "bold"),  # Увеличенный размер заголовка
+    axis.title = element_text(size = 18, face = "bold"),  # Увеличенные подписи осей
+    axis.text = element_text(size = 16),  # Увеличенные значения на осях
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 14),  # Наклоненные подписи оси X и увеличенный шрифт
+    axis.title.x = element_text(size = 18, face = "bold"),  # Увеличенный размер подписи оси X
+    axis.title.y = element_text(size = 18, face = "bold")   # Увеличенный размер подписи оси Y
+  )
+# логарифмическая шкала помогает смягчить влияние экстремальной цены (график более понятный и сбалансированный)
 
 # гистограмма для пробега
-ggplot(car, aes(x=km_driven)) +
-  geom_histogram(color="black", fill="blue", bins = 200) +
-  labs(x='Km Driven') +
-  labs(title = "Histogram Graph of Km Driven") +
-  scale_x_continuous(trans='log10')  # убирает научное обозначение
+# Построим гистограмму для визуализации распределения пробега
+ggplot(car, aes(x = year, y = km_driven)) +
+  geom_point(color = "black") +  # Темные точки на графике
+  labs(x = 'Year', y = 'Km Driven', title = "Scatter Plot of Km Driven vs Year") +  # Названия осей и заголовок
+  theme(
+    plot.title = element_text(size = 20, face = "bold"),  # Увеличенный размер заголовка
+    axis.title = element_text(size = 18, face = "bold"),  # Увеличенные подписи осей
+    axis.text = element_text(size = 16),  # Увеличенные значения на осях
+    axis.text.x = element_text(size = 18)  # Увеличенные подписи на оси X
+  )
+
 
 # матрица корреляции
 library(corrplot)
-corrplot(cor(car), type="full",
-         method ="color", title = "Correlation Plot",
-         mar=c(0,0,1,0), tl.cex= 0.8, outline= T, tl.col="indianred4")
+library(RColorBrewer)
+library(grid)
+
+car_cor <- cor(car)  # Сначала рассчитываем корреляционную матрицу
+
+# Построение корреляционной матрицы
+corrplot(
+  car_cor,
+  type = "full",
+  method = "color",
+  mar = c(0, 0, 1, 0),  # Убираем отступы сверху
+  tl.cex = 1.5,  # Увеличиваем размер шрифта
+  tl.srt = 45,   # Наклоняем подписи на 45 градусов
+  outline = TRUE,
+  tl.col = "black",  # Подписи черного цвета
+  col = brewer.pal(9, "Blues")  # Используем палитру Blues из RColorBrewer
+)
 
 # заполним корреляционную матрицу числовыми обозначениями
 ggcorr(car, label = T)
@@ -201,11 +325,43 @@ importance_lr <- as.data.frame(sort(round(relImportance$lmg, 3), decreasing=TRUE
 importance_lr
 
 # теперь мы конструируем модель используя важные переменные
-lr <- lm(selling_price ~ name+year+km_driven+seller_type+mileage+transmission+max_power, data = Train)
-summary(lr)
+library(ggplot2)
+install.packages("ggfortify")
 
-# основные графики диагностики для модели линейной регрессии
-plot(lr)
+library(ggfortify)
+
+# Создание модели линейной регрессии
+lr <- lm(selling_price ~ name + year + km_driven + seller_type + mileage + transmission + max_power, data = Train)
+options(scipen=999)
+# Основные графики диагностики модели линейной регрессии
+autoplot(lr, which = 1:4) +
+  theme_minimal(base_size = 16) +  # Убираем лишний фон и увеличиваем текст
+  theme(
+    plot.title = element_text(size = 18, face = "bold"),
+    axis.title = element_text(size = 16),
+    axis.text = element_text(size = 16),
+    panel.grid.major = element_line(color = "grey80"), # Более мягкая сетка
+    panel.grid.minor = element_blank(), # Убираем мелкую сетку
+    plot.background = element_rect(fill = "white", color = NA) # Белый фон без границ
+  )
+
+
+library(ggplot2)
+library(broom)
+
+# Вычисляем диагностические значения
+diag_data <- augment(lr)
+
+# Строим график Residuals vs Leverage
+ggplot(diag_data, aes(x = .hat, y = .std.resid)) +
+  geom_point(color = "black") +  # Темные точки
+  geom_smooth(method = "loess", color = "black", se = FALSE) +  # Гладкая кривая тренда
+  labs(
+    title = "Residuals vs Leverage",
+    x = "Leverage",
+    y = "Standardized Residuals"
+  ) +
+  theme_minimal(base_size = 16)  # Увеличенный шрифт для читаемости
 
 # теперь считаем корень из среднеквадратичной ошибки
 pred_lr <- predict(lr, newdata = Test)
@@ -214,10 +370,22 @@ RMSE_lr <- round(sqrt(mean(error_lr^2)),2)
 RMSE_lr
 
 # построим диаграмму и сравним фактические и предсказанные цены продажи автомобилей
+options(scipen=999)  # Отключаем научную нотацию
+
 dev.new()  # Открыть новое окно графика
-plot(Test$selling_price, pred_lr, main="Scatterplot",
-     col="green", xlab="Actual Selling Price", ylab="Predicted Selling Price")
-abline(a=0, b=1, col="blue", lwd=2)
+plot(Test$selling_price, pred_lr,
+     main = "Scatterplot: Actual vs Predicted Selling Price using LR",
+     col = "black",  # Черные точки
+     xlab = "Actual Selling Price",
+     ylab = "Predicted Selling Price",
+     pch = 16,       # Плотные точки
+     cex.lab = 1.5,  # Увеличенный размер подписей осей
+     cex.axis = 1.5, # Увеличенный размер шкалы
+     cex.main = 1.8  # Увеличенный заголовок
+)
+
+abline(a = 0, b = 1, col = "black", lwd = 2)  # Черная линия y = x
+
 
 # Elastic Net
 train_cont <- trainControl(method = "repeatedcv",
@@ -240,15 +408,23 @@ error_er <- Test$selling_price - pred_er
 RMSE_er <- sqrt(mean(error_er^2))
 RMSE_er <- round(RMSE_er,2)
 
+options(scipen=999)  # Отключаем научную нотацию
+
 # Строим scatter plot (распределение фактических и предсказанных значений)
 plot(Test$selling_price, pred_er,
-     main="Actual vs Predicted (Elastic Regression)",
-     col="red",
-     xlab="Actual Selling Price",
-     ylab="Predicted Selling Price")
+     main = "Actual vs Predicted (Elastic Regression)",
+     col = "black",    # Черные точки
+     xlab = "Actual Selling Price",
+     ylab = "Predicted Selling Price",
+     pch = 16,         # Плотные точки
+     cex.lab = 1.5,    # Увеличенный размер подписей осей
+     cex.axis = 1.5,   # Увеличенный размер шкалы
+     cex.main = 1.8    # Увеличенный заголовок
+)
 
 # Добавляем линию, где фактические значения равны предсказанным
-abline(a=0, b=1, col="blue", lwd=2)
+abline(a = 0, b = 1, col = "black", lwd = 2)  # Черная линия y = x
+
 
 # Модели
 Model <- c('Linear Regression', 'Elastic Net')
